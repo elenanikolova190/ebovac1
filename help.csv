@@ -1,0 +1,8 @@
+step;text
+1;Select the model you want to use.
+2;Specify the POPULATION. You can choose the affected population size and the initial number of cases.
+3;Specify the VACCINE characteristics, including the vaccine efficacy and offset of immunity.
+4;In TRIAL you can select the starting day of trial, the number of vaccine doses and the number of days the trial will run for.
+5;EPIDEMICS allows you to choose number of days the virus is latent after infection and the duration of infection (in days).
+6;You can play around with the INTERVENTION parameters to change the spread of the epidemic.
+7;That's it. Enjoy useing EBOVAC and don't hesitate if you have suggestions or comments. You're feedback is very much appreciated!
