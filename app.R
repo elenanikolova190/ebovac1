@@ -227,7 +227,7 @@ server <- function(input, output) {
 
       aggr_data_1dlp <- onedlpServer("1dlp", theta )
       aggr_data_1daonp <- onedaonpServer("1daonp", theta )
-      aggr_data_2dlp <- twodlpServer("2dlp", theta)
+#      aggr_data_2dlp <- twodlpServer("2dlp", theta)
 
       # One dose leaky protection table
       weekly_out_1dlp <- aggr_data_1dlp %>%
