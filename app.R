@@ -22,9 +22,9 @@ library(rsconnect)
 
 
 source('1dlp_module.R', local = TRUE)
-source('2dlp_module.R', local = TRUE)
-source('1daonp_module.R', local = TRUE)
-source('global.R', local = TRUE)
+source('2dlp_module.R')
+source('1daonp_module.R')
+source('global.R')
 
 
 ui <- dashboardPage(
@@ -74,7 +74,6 @@ ui <- dashboardPage(
       a(
         strong("ABOUT Ebovac"),
         height = 40,
-   #     href = "https://github.com/ceefluz/radar/blob/master/README.md",
         title = "",
         target = "_blank"
       ),
@@ -142,48 +141,54 @@ ui <- dashboardPage(
     introjsUI(),
 
     fluidRow(
-      tabsetPanel(
-        tabPanel("One dose leaky",
-                 fluidRow(
-                   column(12,
-                          plotOutput("plot1dl")
-                  ),
-                  column(12,
-                         tableOutput("table1dl")
-                  )
-                )
-        ),
-        tabPanel("One dose all or nothing",
-                 fluidRow(
-                   column(12,
-                          plotOutput("plot1daon")
-                   ),
-                   column(12,
-                          tableOutput("table1daon")
-                   )
-                )
-        ),
-        tabPanel("Two dose leaky",
-                 fluidRow(
-                   column(12,
-                          plotOutput("plot1dl")
-                   ),
-                   column(12,
-                          tableOutput("table1dl")
-                   )
-                 )
-        ),
-        tabPanel("Two dose all or nothing",
-                 fluidRow(
-                   column(12,
-                          plotOutput("plot1dl")
-                   ),
-                   column(12,
-                          tableOutput("table1dl")
-                   )
-                 )
-        )
-      )
+      h4("One Dose Leaky Protection Model Results"), br(),
+      plotOutput("plot1dl"), br(),
+      dataTableOutput("table1dl")
+#      h4("One Dose All or Nothing Protection Model Results"), br(),
+#      plotOutput("plot1daon"), br(),
+#      dataTableOutput("table1daon")
+ #     tabsetPanel(
+#        tabPanel("One dose leaky",
+ #                fluidRow(
+  #                 column(12,
+   #                       plotOutput("plot1dl")
+    #              ),
+     #             column(12,
+      #                   ç
+#                  )
+#                )
+ #       ),
+  #      tabPanel("One dose all or nothing",
+   #              fluidRow(
+    #               column(12,
+     #                     plotOutput("plot1daon")
+      #             ),
+       #            column(12,
+        #                  tableOutput("table1daon")
+#                   )
+ #               )
+  #      ),
+   #     tabPanel("Two dose leaky",
+#                 fluidRow(
+ #                  column(12,
+  #                        plotOutput("plot1dl")
+   #                ),
+    #               column(12,
+     #                     tableOutput("table1dl")
+      #             )
+       #          )
+  #      ),
+   #     tabPanel("Two dose all or nothing",
+  #               fluidRow(
+   #                column(12,
+    #                      plotOutput("plot1dl")
+     #              ),
+      #             column(12,
+       #                   tableOutput("table1dl")
+        #           )
+         #        )
+#        )
+ #     )
     )
 
   ) # end of dashboardbody
@@ -195,14 +200,12 @@ ui <- dashboardPage(
 
 server <- function(input, output) {
 
-
-
 ## UPDATE INPUT VARIABLES-------------------------------------------------------
   observeEvent(
     input$confirm,
     {
 
-      print("entered the observe event sequence")
+#      print("entered the observe event sequence")
 
       # The intput variables parsed into a data frame
       inputVars <- reactiveValues(
@@ -260,12 +263,11 @@ server <- function(input, output) {
 
 
 
-      #SUMMARY TABLE ---------------------------------------------------------
+      #SUMMARY TABLE FOR ONE DOSE LEAAKY PROTECTION MODEL-----------------------------------------
 
       vac_duration <- theta[["vac_duration"]]
       vac_total    <- theta[["Nv"]]
 
-      print("About to call vac_15days")
       vaccinated_15days_ <- as.matrix(vaccinated_15days(Vn = vac_total, vac_duration = vac_duration))
 
       summary_15days <- aggr_data_1dlp %>%
@@ -276,23 +278,25 @@ server <- function(input, output) {
           Vaccinated_Inf_15 = sum(Vac_inf),
           Control_Inf_15 = sum(Cont_inf)
         ) %>%
-        subset( select=c(Vprotected_15, Vaccinated_Inf_15, Control_Inf_15)) %>% t()
+        subset( select=c( Vaccinated_Inf_15, Control_Inf_15)) %>% t()
 
       my_name_vector = c("Day15", "Day30", "Day45", "Day60", "Day75", "Day90", "Day105", "Day120", "Day135", "Day150");
 
       outTable = as.data.frame(t(vaccinated_15days_));
       colnames(outTable) <- my_name_vector;
-      sum15Table <- summary_15days[1:3, 1:10]
-      print(sum15Table)
+      sum15Table <- summary_15days[1:2, 1:10]
+
       colnames(sum15Table) <- my_name_vector;
       summaryTable <- rbind(outTable, sum15Table)
-      rownames(summaryTable) <- c("Vaccinated","Vaccinated Protected","Vaccinated Infected","Control Arm Infected")
+      rownames(summaryTable) <- c("Vaccinated","Vaccinated Infected","Control Arm Infected")
+
 
       output$plot1dl <- renderPlot({
-        ggplot(data = df_plot_1dlp) +
+        ggplot(data = df_plot_1dlp) + ggtitle("Weekly incidence in trial participants") +
+          theme(plot.title = element_text(hjust = 0.5, size=14, face="bold.italic")) +
           geom_point(mapping = aes(x = weeks, y = Infected, color = state))
         })
-      output$table1dl <- renderDataTable(summaryTable)
+      output$table1dl <- renderDataTable(summaryTable, caption = "Number of infected trial participants")
 
       output$plot1daon <- renderPlot({
         ggplot(data = df_plot_1daon ) +

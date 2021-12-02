@@ -367,8 +367,6 @@ twodlpServer <- function(id, theta) {
       traj <- two_dose_leaky_model(theta, init.state, times)
       num_rows <- nrow(traj)
 
-      print(traj)
-
       aggr_data <- traj[vac_start:num_rows,] %>%
         subset( select=c( Sv, Ev, Vp, Ip, Rp,Iv, B, Ib, Rb, Ic1, Ic2, Rc1, Rc2, Icb, Rcb, Ib2, Rb2, Evac, Ivac, Rvac)) %>%
         mutate(
@@ -387,7 +385,7 @@ twodlpServer <- function(id, theta) {
           Vac = as.integer(Vac),#as.integer(Vac/num_vac_daily ), #- lag(Vac, default = first(Vac))),
           Vac_exp = as.integer(Vac_exp),
           Vac_prot = as.integer(Vac_prot/theta[["immunity_onset"]]),
-  #ß        Vac_inf_washout = as.integer(Vac_inf_washout / d_inf),
+  #       Vac_inf_washout = as.integer(Vac_inf_washout / d_inf),
           Vac_inf = as.integer(Vac_inf / d_inf),
           Cont_inf = as.integer(Cont_inf / d_inf),
           Evac_inf = as.integer(Evac_inf / d_inf)

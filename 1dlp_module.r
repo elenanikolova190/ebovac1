@@ -8,7 +8,6 @@ one_dose_leaky <- function(time, state, theta) {
   N            <- theta[["N"]]            # Affected population size
   r_lat        <- 1/theta[["d_lat"]]      # Latency period
   r_inf        <- 1/theta[["d_inf"]]      # Infectious period
-#  r_prot       <- 1/theta[["d_prot"]]     # Rate of protection
   VE           <- theta[["VE"]]           # Vaccine efficacy
   vac_start    <- theta[["vac_start"]]    # Starting day of trial (counted from beginning of epidemic, e.g. day 30)
   vac_duration <- theta[["vac_duration"]] # How many days the trial will go on
