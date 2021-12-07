@@ -1,3 +1,5 @@
+
+
 #' Title Two doses leaky protection model functions
 #'
 #'
@@ -51,7 +53,7 @@ two_dose_all_or_nothing <- function(time, state, theta) {
   Iu <- state[["Iu"]]
   Ru <- state[["Ru"]]
 
-  # Vaccinated arm of the trial after booster
+  # Vaccinated arm of the trial after booster - unprotected
   Bu <- state[["B"]]
   Ebu <- state[["Eb"]]
   Ibu <- state[["Ib"]]
@@ -155,7 +157,7 @@ two_dose_all_or_nothing <- function(time, state, theta) {
   }
   else if((time >= vac_start) & (time < vac_start_booster )) # From the moment trial begins until booster
   {
-    # To ensure that vaccination ends end right time
+    # To ensure that vaccination ends at right time
     if((time >= vac_start) & (time < vac_end_1st_dose )){
       r_vac <- (doses_num /(S+E)) / vac_duration
       r_vac_b <- 0.0
@@ -197,7 +199,7 @@ two_dose_all_or_nothing <- function(time, state, theta) {
     dRc1 <- r_inf * Ic1
 
     # Control arm of the trial after onset of partial immunity
-    dC2  <-  kappa * C1 - r_vac_b * C2 - lambda * C2
+    dC2  <-  kappa * C1 - r_vac_b * C2 - lambda * C2   #r_ac_b is set to zero
     dEc2 <- lambda * C2 - r_lat * Ec2
     dIc2 <- r_lat * Ec2 - r_inf * Ic2
     dRc2 <- r_inf * Ic2
@@ -248,12 +250,11 @@ two_dose_all_or_nothing <- function(time, state, theta) {
     dIv <- r_lat * Ev - r_inf * Iv
     dRv <- r_inf * Iv
 
-    # Vaccinated arm of the trial after onset of partial immunity
-    dVp <- kappa*Sv - r_vac_b*Vp - (1 - VE/2) * lambda * Vp
-    dEp <- (1 - VE/2) * lambda * Vp - r_lat * Ep
-    dIp <- r_lat * Ep - r_inf * Ip
-    dRp <- r_inf *Ip
-
+    # Vaccinated arm of the trial after onset of immunity
+    # Full immunity is assumed after 1st dose in patients for whom the vaccine work
+    # The Bp and Pab containers are redundant with this assumption, althouth that these
+    # participants would still need to be administered second dose
+    dVp <- kappa*Sv - r_vac_b*Vp
     dBp <- r_vac_b * Vp - kappa2 * Bp
     dPab <- kappa2 * Bp
 
@@ -268,15 +269,6 @@ two_dose_all_or_nothing <- function(time, state, theta) {
     dEab <- lambda * Uab - r_lat * Eab
     dIab <- r_lat * Eab - r_inf * Iab
     dRab <- r_inf *Iab
-
-    # Vaccinated arm of the trial after booster
-    dB  <- r_vac_b * Vp - (1 - VE/2) * lambda * B - kappa2*B
-    dEb <- (1 - VE/2) * lambda * B - r_lat * Eb
-    dIb <- r_lat * Eb - r_inf * Ib
-    dRb <- r_inf *Ib
-
-    # Vaccinated arm of the trial after onset of partial immunity
-    dBp  <- kappa2*B - (1-VE)*lambda*Bp
 
     # Control arm of the trial before onset of immunity
     dC1  <- r_vac * S - lambda * C1 - kappa * C1
@@ -305,8 +297,9 @@ two_dose_all_or_nothing <- function(time, state, theta) {
   }
 
   return(list(c(dS, dE, dI, dR, dEvac, dIvac, dRvac,
-                dSv, dEv, dIv, dRv, dVp, dEp, dIp, dRp,
-                dB, dEb, dIb, dRb, dB, dEb, dIb, dRb,
+                dSv, dEv, dIv, dRv, dVu, dEu, dIu, dRu,
+                dBu, dEbu, dIbu, dRbu, dVp, dBp, dPab,
+                dUab, dEab, dIab, dRab,
                 dC1, dEc1, dIc1, dRc1, dC2, dEc2, dIc2, dRc2,
                 dCb, dEcb, dIcb, dRcb, dCb2, dEb2, dIb2, dRb2)))
 
@@ -359,18 +352,21 @@ twodaonpServer <- function(id, theta) {
         Ev = 0,
         Iv = 0,
         Rv = 0,
+        Vu = 0,
+        Eu = 0,
+        Iu = 0,
+        Ru = 0,
+        Bu = 0,
+        Ebu = 0,
+        Ibu = 0,
+        Rbu = 0,
+        Uab = 0,
+        Eab = 0,
+        Iab = 0,
+        Rab = 0,
         Vp = 0,
-        Ep = 0,
-        Ip = 0,
-        Rp = 0,
-        B = 0,
-        Eb = 0,
-        Ib = 0,
-        Rb = 0,
         Bp = 0,
-        Ebp = 0,
-        Ibp = 0,
-        Rbp = 0,
+        Pab = 0,
         C1 = 0,
         Ec1 = 0,
         Ic1 = 0,
